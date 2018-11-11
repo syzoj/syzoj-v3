@@ -1,39 +1,46 @@
 {
   "name": "syzoj-v3",
   "version": "0.0.0",
-  "description": "The new version of SYZOJ",
-  "main": "src/index.js",
-  "repository": "git@github.com:syzoj/syzoj-v3.git",
-  "author": "Menci <huanghaorui301@gmail.com>",
-  "license": "AGPL-3.0",
   "private": true,
+  "description": "The new version of SYZOJ",
+  "repository": "git@github.com:syzoj/syzoj-v3.git",
+  "license": "AGPL-3.0",
+  "author": "Menci <huanghaorui301@gmail.com>",
+  "main": "src/Bootstrap.js",
   "scripts": {
-    "start": "nodemon --watch 'src/**/*' -e ts,tsx --exec 'ts-node' --files ./src/index.ts"
+    "dev-watch": "nodemon --watch 'src/**/*' -e ts,tsx --exec 'node --no-deprecation ./node_modules/.bin/ts-node' ./src/Bootstrap.ts --",
+    "dev": "node --no-deprecation node_modules/.bin/ts-node src/Bootstrap.ts"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",
     "bcrypt": "^3.0.2",
+    "fs-extra": "^7.0.1",
     "koa": "^2.6.1",
     "koa-bodyparser": "^4.2.1",
     "koa-multer": "^1.0.2",
     "koa-session": "^5.10.0",
+    "lodash": "^4.17.11",
     "mongoose": "^5.3.10",
+    "randomstring": "^1.1.5",
     "reflect-metadata": "^0.1.12",
-    "ts-md5": "^1.2.4",
     "typegoose": "^5.4.1",
-    "validator": "^10.9.0"
+    "typescript": "^3.1.6",
+    "validator": "^10.9.0",
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/fs-extra": "^5.0.4",
     "@types/koa": "^2.0.46",
     "@types/koa-bodyparser": "^5.0.1",
     "@types/koa-multer": "^1.0.0",
     "@types/koa-session": "^5.7.4",
+    "@types/lodash": "^4.14.118",
     "@types/mongoose": "^5.3.1",
+    "@types/randomstring": "^1.1.6",
     "@types/validator": "^9.4.2",
     "nodemon": "^1.18.6",
     "ts-node": "^7.0.1",
-    "tslint": "^5.11.0",
-    "typescript": "^3.1.6"
+    "tslint": "^5.11.0"
   }
 }

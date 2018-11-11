@@ -3,9 +3,10 @@ import * as KoaSession from "koa-session";
 
 import { User } from "Services/User";
 
+app.koaApp.keys = [app.config.security.sessionSecret];
 app.koaApp.use(KoaSession({
     rolling: true,
-    signed: false
+    signed: true
 }, app.koaApp));
 
 // Because a user's info can be modified when it's logged in,

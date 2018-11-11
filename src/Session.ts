@@ -20,9 +20,11 @@ app.koaApp.use(async (ctx, next) => {
         if (user) {
             (ctx.state.user as User) = user;
         }
-    } else {
+    }
+
+    if (!ctx.state.user) {
         // Workaround: The @State() in "routing-controllers" has a bug -- if
-        // the state is null or undefined, it will
+        // the state is null or undefined, it will throw a error.
         ctx.state.user = false;
     }
 
@@ -30,7 +32,7 @@ app.koaApp.use(async (ctx, next) => {
 
     if (ctx.state.user) {
         // User logged in.
-        (ctx.session.user as string) = await (ctx.state.user as User).getUUID();
+        (ctx.session.user as string) = await (ctx.state.user as User).uuid;
     } else {
         delete ctx.session.user;
     }

@@ -31,7 +31,21 @@ export class User {
         }
     }
 
+    get uuid(): string { return this.data._id.toString(); }
+    get userName(): string { return this.data.userName; }
+    set userName(userName: string) { this.data.userName = userName; }
+    get description(): string { return this.data.description; }
+    set description(description: string) { this.data.description = description; }
+    get email(): string { return this.data.email; }
+    set email(email: string) { this.data.email = email; }
+    get isAdmin(): boolean { return this.data.isAdmin; }
+    set isAdmin(isAdmin: boolean) { this.data.isAdmin = isAdmin; }
+
     async checkPassword(password: string): Promise<boolean> {
+        if (!password) {
+            return false;
+        }
+
         // The hashed password contains salt, bcrypt.compare() will
         // handle it correctly.
         return await bcrypt.compare(password, this.data.passwordHash);
@@ -44,11 +58,12 @@ export class User {
         this.data.passwordHash = await bcrypt.hash(password, 10);
     }
 
-    async hasPrivilege(privilege: UserPrivilege): Promise<boolean> {
-        return this.data.privileges.includes(privilege);
+    hasPrivilege(privilege: UserPrivilege): boolean {
+        // A user with isAdmin = true has all privileges.
+        return this.data.isAdmin || this.data.privileges.includes(privilege);
     }
 
-    async addPrivilege(privilege: UserPrivilege): Promise<void> {
+    addPrivilege(privilege: UserPrivilege): void {
         // Privileges are stored in a array, not a set.
         // Perform a check to ensure uniqueness.
         if (this.hasPrivilege(privilege)) {
@@ -58,11 +73,7 @@ export class User {
         this.data.privileges.push(privilege);
     }
 
-    async getUUID(): Promise<string> {
-        return this.data._id.toString();
-    }
-
-    async getBriefInfo(): Promise<IUserBriefInfo> {
+    getBriefInfo(): IUserBriefInfo {
         return {
             uuid: this.data._id.toString(),
             userName: this.data.userName,

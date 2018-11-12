@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { JsonController, Param, BodyParam, State, Get, Post, OnUndefined } from "routing-controllers";
+import { JsonController, Param, BodyParam, State, Get, Post, OnUndefined, Authorized } from "routing-controllers";
 
 import NotFoundError from "Errors/NotFoundError";
 import AuthError, { AuthErrorType } from "Errors/AuthError";
@@ -33,11 +33,8 @@ export class UserController {
 
     // Get a logged in user's brief info.
     @Get("/user/self")
+    @Authorized()
     private async GET_user_self(@State("user") user: User): Promise<IUserBriefInfo> {
-        if (!user) {
-            throw new AuthError(AuthErrorType.NotLoggedIn);
-        }
-
         return await user.getBriefInfo();
     }
 
@@ -55,6 +52,7 @@ export class UserController {
     //              email without verify (including itself).
     @Post("/user/update/:uuid")
     @OnUndefined(200)
+    @Authorized()
     private async POST_user_update(@State("user") currentUser: User,
                                    @Param("uuid") uuid: string,
                                    @BodyParam("userName") userName: string,
@@ -62,10 +60,6 @@ export class UserController {
                                    @BodyParam("oldPassword") oldPassword: string,
                                    @BodyParam("newPassword") newPassword: string,
                                    @BodyParam("email") email: string): Promise<void> {
-        if (!currentUser) {
-            throw new AuthError(AuthErrorType.NotLoggedIn);
-        }
-
         const targetUser: User = await User.findByUUID(uuid);
         if (!targetUser) {
             throw new NotFoundError(User, { uuid });

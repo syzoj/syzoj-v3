@@ -1,22 +1,34 @@
 // tslint:disable-next-line
 require("app-module-path").addPath(__dirname);
 
+import AuthError, { AuthErrorType } from "Errors/AuthError";
+
 import app from "App";
-import { useKoaServer } from "routing-controllers";
+import { useKoaServer, Action } from "routing-controllers";
 
 (async () => {
+    // Parse command line arguments.
     const args = JSON.parse(process.argv[process.argv.length - 1]);
 
+    // Initialize application.
     await app.initialize(args.config);
 
+    // Load session support.
     require("Session");
 
+    // Load controllers.
     try {
         useKoaServer(app.koaApp, {
             controllers: [
                 __dirname + "/Controllers/*.ts"
             ],
-            defaultErrorHandler: false
+            defaultErrorHandler: false,
+            authorizationChecker: async (action: Action): Promise<boolean> => {
+                if (!action.context.state.user) {
+                    throw new AuthError(AuthErrorType.NotLoggedIn);
+                }
+                return true;
+            }
         });
         app.logger.info(`Successfully loaded controllers.`);
     } catch (e) {
@@ -32,5 +44,6 @@ import { useKoaServer } from "routing-controllers";
         };
     });
 
+    // Start application.
     app.start();
 })();

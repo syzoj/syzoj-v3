@@ -15,7 +15,7 @@ class SYZOJ {
     public logger: Winston.Logger;
     public config: IConfig;
 
-    public async initialize(configFile: string) {
+    public async initialize(configFile: string, version: any) {
         this.logger = Winston.createLogger({
             level: "info",
             format: Winston.format.combine(
@@ -27,7 +27,10 @@ class SYZOJ {
             transports: [new Winston.transports.Console()]
         });
 
-        this.logger.info("Bootstraping...");
+        this.logger.info(`Starting SYZOJ-v3 version ${version.versionString}.`);
+        if (version.gitVersion) {
+            this.logger.warn(`This is a git version (${version.gitVersion}) and maybe unstable, use it with caution in production!`);
+        }
 
         // If the configuration file doesn't exist, write the default configuration
         // file to it.

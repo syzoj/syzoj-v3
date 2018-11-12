@@ -11,7 +11,7 @@ import { useKoaServer, Action } from "routing-controllers";
     const args = JSON.parse(process.argv[process.argv.length - 1]);
 
     // Initialize application.
-    await app.initialize(args.config);
+    await app.initialize(args.config, args.version);
 
     // Load session support.
     require("Session");

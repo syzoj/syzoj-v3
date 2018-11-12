@@ -2,23 +2,12 @@
 require("app-module-path").addPath(__dirname);
 
 import app from "App";
-import * as Commander from "commander";
 import { useKoaServer } from "routing-controllers";
 
 (async () => {
-    const packageInfo = require("../package");
-    Commander
-        .name(packageInfo.name)
-        .usage("--config <file>")
-        .version(packageInfo.version)
-        .option("-c, --config <file>", "Configuration file (If the path don't exist, it will be created automatically)")
-        .parse(process.argv);
+    const args = JSON.parse(process.argv[process.argv.length - 1]);
 
-    if (!Commander.config) {
-        Commander.help();
-    }
-
-    await app.initialize(Commander.config);
+    await app.initialize(args.config);
 
     require("Session");
 

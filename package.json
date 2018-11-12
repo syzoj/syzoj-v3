@@ -8,8 +8,8 @@
   "author": "Menci <huanghaorui301@gmail.com>",
   "main": "src/Bootstrap.js",
   "scripts": {
-    "dev-watch": "nodemon --watch 'src/**/*' -e ts,tsx --exec 'node --no-deprecation' index.js --",
-    "dev": "node --no-deprecation index.js"
+    "dev-watch": "nodemon --watch 'src/**/*' -e ts,tsx index.js --",
+    "dev": "node index.js"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",

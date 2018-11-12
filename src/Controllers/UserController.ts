@@ -10,8 +10,8 @@ import { User, IUserBriefInfo, UserPrivilege } from "Services/User";
 @JsonController()
 export class UserController {
     // Get a user's brief info by its uuid.
-    @Get("/user/uuid/:uuid")
-    private async GET_user_uuid(@Param("uuid") uuid: string): Promise<IUserBriefInfo> {
+    @Get("/user/getByUUID/:uuid")
+    private async getByUUID(@Param("uuid") uuid: string): Promise<IUserBriefInfo> {
         const user: User = await User.findByUUID(uuid);
         if (!user) {
             throw new NotFoundError(User, { uuid });
@@ -21,8 +21,8 @@ export class UserController {
     }
 
     // Get a user's brief info by its userName.
-    @Get("/user/userName/:userName")
-    private async GET_user_userName(@Param("userName") userName: string): Promise<IUserBriefInfo> {
+    @Get("/user/getByUserName/:userName")
+    private async getByUserName(@Param("userName") userName: string): Promise<IUserBriefInfo> {
         const user: User = await User.findByUserName(userName);
         if (!user) {
             throw new NotFoundError(User, { userName });
@@ -32,9 +32,9 @@ export class UserController {
     }
 
     // Get a logged in user's brief info.
-    @Get("/user/self")
+    @Get("/user/getSelf")
     @Authorized()
-    private async GET_user_self(@State("user") user: User): Promise<IUserBriefInfo> {
+    private async getSelf(@State("user") user: User): Promise<IUserBriefInfo> {
         return await user.getBriefInfo();
     }
 
@@ -53,13 +53,13 @@ export class UserController {
     @Post("/user/update/:uuid")
     @OnUndefined(200)
     @Authorized()
-    private async POST_user_update(@State("user") currentUser: User,
-                                   @Param("uuid") uuid: string,
-                                   @BodyParam("userName") userName: string,
-                                   @BodyParam("description") description: string,
-                                   @BodyParam("oldPassword") oldPassword: string,
-                                   @BodyParam("newPassword") newPassword: string,
-                                   @BodyParam("email") email: string): Promise<void> {
+    private async update(@State("user") currentUser: User,
+                         @Param("uuid") uuid: string,
+                         @BodyParam("userName") userName: string,
+                         @BodyParam("description") description: string,
+                         @BodyParam("oldPassword") oldPassword: string,
+                         @BodyParam("newPassword") newPassword: string,
+                         @BodyParam("email") email: string): Promise<void> {
         const targetUser: User = await User.findByUUID(uuid);
         if (!targetUser) {
             throw new NotFoundError(User, { uuid });
@@ -102,10 +102,10 @@ export class UserController {
     @Post("/user/updatePrivilege/:uuid")
     @OnUndefined(200)
     @Authorized()
-    private async POST_user_updatePrivilege(@State("user") currentUser: User,
-                                            @Param("uuid") uuid: string,
-                                            @BodyParam("privilege") privilege: string,
-                                            @BodyParam("grant") grant: boolean): Promise<void> {
+    private async updatePrivilege(@State("user") currentUser: User,
+                                  @Param("uuid") uuid: string,
+                                  @BodyParam("privilege") privilege: string,
+                                  @BodyParam("grant") grant: boolean): Promise<void> {
         if (!currentUser.isAdmin) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }

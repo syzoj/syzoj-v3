@@ -11,10 +11,10 @@ import { User, IUserBriefInfo } from "Services/User";
 @JsonController()
 export class AuthController {
     @Post("/auth/register")
-    private async POST_auth_register(@State() state,
-                                     @BodyParam("userName") userName: string,
-                                     @BodyParam("password") password: string,
-                                     @BodyParam("email") email: string): Promise<IUserBriefInfo> {
+    private async register(@State() state,
+                           @BodyParam("userName") userName: string,
+                           @BodyParam("password") password: string,
+                           @BodyParam("email") email: string): Promise<IUserBriefInfo> {
         if (state.user) {
             throw new AuthError(AuthErrorType.AlreadyLoggedIn);
         }
@@ -40,9 +40,9 @@ export class AuthController {
     }
 
     @Post("/auth/login")
-    private async POST_auth_login(@State() state,
-                                  @BodyParam("userName") userName: string,
-                                  @BodyParam("password") password: string): Promise<IUserBriefInfo> {
+    private async login(@State() state,
+                        @BodyParam("userName") userName: string,
+                        @BodyParam("password") password: string): Promise<IUserBriefInfo> {
         if (state.user) {
             throw new AuthError(AuthErrorType.AlreadyLoggedIn);
         }
@@ -63,7 +63,7 @@ export class AuthController {
 
     @Post("/auth/logout")
     @OnUndefined(200)
-    private async POST_auth_logout(@State() state): Promise<void> {
+    private async logout(@State() state): Promise<void> {
         if (!state.user) {
             throw new AuthError(AuthErrorType.NotLoggedIn);
         }

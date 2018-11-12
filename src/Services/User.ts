@@ -73,6 +73,10 @@ export class User {
         this.data.privileges.push(privilege);
     }
 
+    delPrivilege(privilege: UserPrivilege): void {
+        this.data.privileges = this.data.privileges.filter((x: string) => x !== privilege);
+    }
+
     getBriefInfo(): IUserBriefInfo {
         return {
             uuid: this.data._id.toString(),

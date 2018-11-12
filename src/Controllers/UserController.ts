@@ -98,4 +98,31 @@ export class UserController {
         }
         targetUser.email = email;
     }
+
+    @Post("/user/updatePrivilege/:uuid")
+    @OnUndefined(200)
+    @Authorized()
+    private async POST_user_updatePrivilege(@State("user") currentUser: User,
+                                            @Param("uuid") uuid: string,
+                                            @BodyParam("privilege") privilege: string,
+                                            @BodyParam("grant") grant: boolean): Promise<void> {
+        if (!currentUser.isAdmin) {
+            throw new AuthError(AuthErrorType.PermissionDenied);
+        }
+
+        const user: User = await User.findByUUID(uuid);
+        if (!user) {
+            throw new NotFoundError(User, { uuid });
+        }
+
+        if (!(privilege in UserPrivilege)) {
+            throw new InvalidInputError({ privilege });
+        }
+
+        if (grant) {
+            user.addPrivilege(privilege as UserPrivilege);
+        } else {
+            user.delPrivilege(privilege as UserPrivilege);
+        }
+    }
 }

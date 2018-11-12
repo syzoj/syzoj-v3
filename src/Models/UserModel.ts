@@ -19,7 +19,7 @@ class Users extends Typegoose {
     isAdmin: boolean;
 
     @arrayProp({ items: String, default: [] })
-    privileges: [string];
+    privileges: string[];
 }
 
 export const UserModel = new Users().getModelForClass(Users);

@@ -96,7 +96,7 @@ class SYZOJ {
     }
 
     public start() {
-        Mongoose.connect("mongodb://localhost:27017/test", { useNewUrlParser: true });
+        Mongoose.connect(this.config.database.mongoUrl, { useNewUrlParser: true });
         this.logger.info("Database connected successfully.");
         this.koaApp.listen(this.config.server.listenPort, this.config.server.listenHostname).on("error", (err) => {
             this.logger.error(`Can't start HTTP server on ${this.config.server.listenHostname}:${this.config.server.listenPort} - ${err}`);

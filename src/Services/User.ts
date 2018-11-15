@@ -1,10 +1,9 @@
-import { UserInstance, UserModel } from "../Models/UserModel";
-import { Types } from "mongoose";
+import { UserInstance, UserModel } from "Models/UserModel";
+import { UserUserGroupMapInstance, UserUserGroupMapModel } from "Models/UserUserGroupMapModel";
+import { UUID, uuidToString, uuidFromString } from "Models/ModelCommon";
 import { isEmail } from "validator";
 
 import * as bcrypt from "bcrypt";
-import NotFoundError from "Errors/NotFoundError";
-import DuplicateError from "Errors/DuplicateError";
 
 export enum UserPrivilege {
     ManageProblems = "ManageProblems",
@@ -23,7 +22,7 @@ export interface IUserBriefInfo {
 export class User {
     private data: UserInstance;
 
-    constructor(data) {
+    constructor(data: any) {
         if (data instanceof UserModel) {
             this.data = data;
         } else {
@@ -31,7 +30,7 @@ export class User {
         }
     }
 
-    get uuid(): string { return this.data._id.toString(); }
+    get uuid(): UUID { return this.data._id; }
     get userName(): string { return this.data.userName; }
     set userName(userName: string) { this.data.userName = userName; }
     get description(): string { return this.data.description; }
@@ -63,28 +62,38 @@ export class User {
         return this.data.isAdmin || this.data.privileges.includes(privilege);
     }
 
-    addPrivilege(privilege: UserPrivilege): void {
+    // true - Success.
+    // false - Already added.
+    addPrivilege(privilege: UserPrivilege): boolean {
         // Privileges are stored in a array, not a set.
         // Perform a check to ensure uniqueness.
         if (this.hasPrivilege(privilege)) {
-            return;
+            return false;
         }
 
         this.data.privileges.push(privilege);
+        return true;
     }
 
-    delPrivilege(privilege: UserPrivilege): void {
+    // true - Success.
+    // false - Doesn't have.
+    delPrivilege(privilege: UserPrivilege): boolean {
+        if (!this.hasPrivilege(privilege)) {
+            return false;
+        }
+
         this.data.privileges = this.data.privileges.filter((x: string) => x !== privilege);
+        return true;
     }
 
     getBriefInfo(): IUserBriefInfo {
         return {
-            uuid: this.data._id.toString(),
-            userName: this.data.userName,
-            description: this.data.description,
-            email: this.data.email,
-            avatar: this.data.email,
-            isAdmin: this.data.isAdmin
+            uuid: uuidToString(this.uuid),
+            userName: this.userName,
+            description: this.description,
+            email: this.email,
+            avatar: this.email, // TODO: Generate Gravatar URL
+            isAdmin: this.isAdmin
         };
     }
 
@@ -94,13 +103,9 @@ export class User {
 
     // Find a user by a UUID, return null if the passed UUID is illegal or not found.
     static async findByUUID(uuid: string): Promise<User> {
-        try {
-            // uuid may not be a legal object id.
-            const data: UserInstance = await UserModel.findOne({ _id: Types.ObjectId.createFromHexString(uuid) });
-            return data ? new User(data) : null;
-        } catch (e) {
-            return null;
-        }
+        // uuid may not be a legal object id.
+        const data: UserInstance = await UserModel.findOne({ _id: uuidFromString(uuid) });
+        return data ? new User(data) : null;
     }
 
     // Find a user by its userName, return null if not found.

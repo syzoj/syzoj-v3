@@ -5,6 +5,8 @@ import { isEmail } from "validator";
 
 import * as bcrypt from "bcrypt";
 
+import { UserGroup } from "Services/UserGroup";
+
 export enum UserPrivilege {
     ManageProblems = "ManageProblems",
     ManageUsers = "ManageUsers",
@@ -39,6 +41,8 @@ export class User {
     set email(email: string) { this.data.email = email; }
     get isAdmin(): boolean { return this.data.isAdmin; }
     set isAdmin(isAdmin: boolean) { this.data.isAdmin = isAdmin; }
+    get groups(): UUID[] { return this.data.groups; }
+    set groups(groups: UUID[]) { this.data.groups = groups; }
 
     async checkPassword(password: string): Promise<boolean> {
         if (!password) {
@@ -143,5 +147,57 @@ export class User {
         await newUser.save();
 
         return newUser;
+    }
+
+    inGroup(group: UserGroup): boolean {
+        return this.groups.some((x: UUID): boolean => x.equals(group.uuid));
+    }
+
+    // Join a UserGroup. With call to .save() inside.
+    // true - Success.
+    // false - Already joined.
+    async joinGroup(group: UserGroup): Promise<boolean> {
+        if (this.inGroup(group)) {
+            return false;
+        }
+
+        // TODO: Use a transaction.
+        const mapInstance: UserUserGroupMapInstance = new UserUserGroupMapModel({
+            user: this.uuid,
+            group: group.uuid
+        });
+
+        await mapInstance.save();
+
+        group.memberCount++;
+        await group.save();
+
+        this.groups.push(group.uuid);
+        await this.save();
+
+        return true;
+    }
+
+    // Leave a UserGroup. With call to .save() inside.
+    // true - Success.
+    // false - Not joined.
+    async leaveGroup(group: UserGroup): Promise<boolean> {
+        if (!this.inGroup(group)) {
+            return false;
+        }
+
+        // TODO: Use a transaction.
+        const mapInstance: UserUserGroupMapInstance = await UserUserGroupMapModel.findOneAndDelete({
+            user: this.uuid,
+            group: group.uuid
+        });
+
+        group.memberCount--;
+        await group.save();
+
+        this.groups = this.groups.filter((x: UUID) => !x.equals(group.uuid));
+        await this.save();
+
+        return true;
     }
 }

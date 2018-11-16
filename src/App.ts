@@ -7,8 +7,8 @@ import * as Lodash from "lodash";
 
 import CommonError from "Errors/CommonError";
 
-import IConfig from "Config/IConfig";
-import DefaultConfig from "Config/DefaultConfig";
+import IConfig from "Interfaces/IConfig";
+import DefaultConfig from "DefaultConfig";
 
 class SYZOJ {
     public koaApp: KoaApp;

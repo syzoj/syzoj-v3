@@ -1,4 +1,4 @@
-import IConfig from "Config/IConfig";
+import IConfig from "Interfaces/IConfig";
 import { generate as generatrRandomString } from "randomstring";
 
 export default {

@@ -65,7 +65,7 @@ export class UserController {
             throw new NotFoundError(User, { uuid });
         }
 
-        const privileged: boolean = currentUser.hasPrivilege(UserPrivilege.ManageUsers);
+        const privileged: boolean = currentUser.checkPrivilege(UserPrivilege.ManageUsers);
 
         // Only a "ManageUsers" privileged user can modify another user.
         if (!privileged && await targetUser.uuid !== await currentUser.uuid) {

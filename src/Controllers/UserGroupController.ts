@@ -38,7 +38,7 @@ export class UserController {
     @Authorized()
     private async create(@State("user") currentUser: User,
                          @BodyParam("groupName") groupName: string): Promise<IUserGroupBriefInfo> {
-        if (!currentUser.hasPrivilege(UserPrivilege.ManageUsers)) {
+        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
@@ -60,7 +60,7 @@ export class UserController {
     @Authorized()
     private async delete(@State("user") currentUser: User,
                          @BodyParam("uuid") uuid: string): Promise<void> {
-        if (!currentUser.hasPrivilege(UserPrivilege.ManageUsers)) {
+        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
@@ -79,7 +79,7 @@ export class UserController {
     private async addUser(@State("user") currentUser: User,
                           @BodyParam("groupUUID") groupUUID: string,
                           @BodyParam("userUUID") userUUID: string): Promise<void> {
-        if (!currentUser.hasPrivilege(UserPrivilege.ManageUsers)) {
+        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
@@ -106,7 +106,7 @@ export class UserController {
     private async delUser(@State("user") currentUser: User,
                           @BodyParam("groupUUID") groupUUID: string,
                           @BodyParam("userUUID") userUUID: string): Promise<void> {
-        if (!currentUser.hasPrivilege(UserPrivilege.ManageUsers)) {
+        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 

@@ -61,7 +61,7 @@ export class User {
         this.data.passwordHash = await bcrypt.hash(password, 10);
     }
 
-    hasPrivilege(privilege: UserPrivilege): boolean {
+    checkPrivilege(privilege: UserPrivilege): boolean {
         // A user with isAdmin = true has all privileges.
         return this.data.isAdmin || this.data.privileges.includes(privilege);
     }
@@ -71,7 +71,7 @@ export class User {
     addPrivilege(privilege: UserPrivilege): boolean {
         // Privileges are stored in a array, not a set.
         // Perform a check to ensure uniqueness.
-        if (this.hasPrivilege(privilege)) {
+        if (this.checkPrivilege(privilege)) {
             return false;
         }
 
@@ -82,7 +82,7 @@ export class User {
     // true - Success.
     // false - Doesn't have.
     delPrivilege(privilege: UserPrivilege): boolean {
-        if (!this.hasPrivilege(privilege)) {
+        if (!this.checkPrivilege(privilege)) {
             return false;
         }
 

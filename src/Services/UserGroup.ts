@@ -1,5 +1,5 @@
 import { UserGroupInstance, UserGroupModel } from "Models/UserGroupModel";
-import { UUID, uuidToString, uuidFromString } from "Models/ModelCommon";
+import UUIDHelper, { UUID } from "Helpers/UUIDHelper";
 
 export interface IUserGroupBriefInfo {
     uuid: string;
@@ -25,7 +25,7 @@ export class UserGroup {
 
     getBriefInfo(): IUserGroupBriefInfo {
         return {
-            uuid: uuidToString(this.uuid),
+            uuid: UUIDHelper.toString(this.uuid),
             groupName: this.groupName
         };
     }
@@ -35,9 +35,9 @@ export class UserGroup {
     }
 
     // Find a UserGroup by a UUID, return null if the passed UUID is illegal or not found.
-    static async findByUUID(uuid: string): Promise<UserGroup> {
+    static async findByUUID(uuid: UUID): Promise<UserGroup> {
         // uuid may not be a legal object id.
-        const data: UserGroupInstance = await UserGroupModel.findOne({ _id: uuidFromString(uuid) });
+        const data: UserGroupInstance = await UserGroupModel.findOne({ _id: uuid });
         return data ? new UserGroup(data) : null;
     }
 

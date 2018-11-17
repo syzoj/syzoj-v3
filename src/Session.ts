@@ -1,6 +1,7 @@
 import app from "App";
 import * as KoaSession from "koa-session";
 
+import UUIDHelper from "Helpers/UUIDHelper";
 import { User } from "Services/User";
 
 app.koaApp.keys = [app.config.security.sessionSecret];
@@ -17,7 +18,7 @@ app.koaApp.use(KoaSession({
 // means the user likely did a logout, clear the user uuid in session.
 app.koaApp.use(async (ctx, next) => {
     if (ctx.session.user) {
-        const user: User = await User.findByUUID(ctx.session.user as string);
+        const user: User = await User.findByUUID(UUIDHelper.fromString(ctx.session.user as string));
         if (user) {
             (ctx.state.user as User) = user;
         }
@@ -33,7 +34,7 @@ app.koaApp.use(async (ctx, next) => {
 
     if (ctx.state.user) {
         // User logged in.
-        (ctx.session.user as string) = await (ctx.state.user as User).uuid;
+        (ctx.session.user as string) = await UUIDHelper.toString((ctx.state.user as User).uuid);
     } else {
         delete ctx.session.user;
     }

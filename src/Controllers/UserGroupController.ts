@@ -4,17 +4,19 @@ import { JsonController, Param, BodyParam, State, Get, Post, OnUndefined, Author
 import NotFoundError from "Errors/NotFoundError";
 import AuthError, { AuthErrorType } from "Errors/AuthError";
 import InvalidInputError from "Errors/InvalidInputError";
+import DuplicateError from "Errors/DuplicateError";
+
+import UUIDHelper from "Helpers/UUIDHelper";
 
 import { User, UserPrivilege } from "Services/User";
 import { UserGroup, IUserGroupBriefInfo } from "Services/UserGroup";
-import DuplicateError from "Errors/DuplicateError";
 
 @JsonController()
 export class UserController {
     // Get a group's brief info by its uuid.
     @Get("/userGroup/getByUUID/:uuid")
     private async getByUUID(@Param("uuid") uuid: string): Promise<IUserGroupBriefInfo> {
-        const group: UserGroup = await UserGroup.findByUUID(uuid);
+        const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(uuid));
         if (!group) {
             throw new NotFoundError(UserGroup, { uuid });
         }
@@ -38,7 +40,7 @@ export class UserController {
     @Authorized()
     private async create(@State("user") currentUser: User,
                          @BodyParam("groupName") groupName: string): Promise<IUserGroupBriefInfo> {
-        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
+        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
@@ -60,11 +62,11 @@ export class UserController {
     @Authorized()
     private async delete(@State("user") currentUser: User,
                          @BodyParam("uuid") uuid: string): Promise<void> {
-        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
+        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        const group: UserGroup = await UserGroup.findByUUID(uuid);
+        const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(uuid));
         if (!group) {
             throw new NotFoundError(UserGroup, { uuid });
         }
@@ -79,16 +81,16 @@ export class UserController {
     private async addUser(@State("user") currentUser: User,
                           @BodyParam("groupUUID") groupUUID: string,
                           @BodyParam("userUUID") userUUID: string): Promise<void> {
-        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
+        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        const group: UserGroup = await UserGroup.findByUUID(groupUUID);
+        const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(groupUUID));
         if (!group) {
             throw new NotFoundError(UserGroup, { uuid: groupUUID });
         }
 
-        const user: User = await User.findByUUID(userUUID);
+        const user: User = await User.findByUUID(UUIDHelper.fromString(userUUID));
         if (!user) {
             throw new NotFoundError(User, { uuid: userUUID });
         }
@@ -106,16 +108,16 @@ export class UserController {
     private async delUser(@State("user") currentUser: User,
                           @BodyParam("groupUUID") groupUUID: string,
                           @BodyParam("userUUID") userUUID: string): Promise<void> {
-        if (!currentUser.checkPrivilege(UserPrivilege.ManageUsers)) {
+        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        const group: UserGroup = await UserGroup.findByUUID(groupUUID);
+        const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(groupUUID));
         if (!group) {
             throw new NotFoundError(UserGroup, { uuid: groupUUID });
         }
 
-        const user: User = await User.findByUUID(userUUID);
+        const user: User = await User.findByUUID(UUIDHelper.fromString(userUUID));
         if (!user) {
             throw new NotFoundError(User, { uuid: userUUID });
         }

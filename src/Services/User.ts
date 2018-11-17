@@ -1,9 +1,11 @@
 import { UserInstance, UserModel } from "Models/UserModel";
 import { UserUserGroupMapInstance, UserUserGroupMapModel } from "Models/UserUserGroupMapModel";
-import { UUID, uuidToString, uuidFromString } from "Models/ModelCommon";
+import UUIDHelper, { UUID } from "Helpers/UUIDHelper";
 import { isEmail } from "validator";
 
 import * as bcrypt from "bcrypt";
+
+import IPermissionControl from "Interfaces/IPermissionControl";
 
 import { UserGroup } from "Services/UserGroup";
 
@@ -61,17 +63,12 @@ export class User {
         this.data.passwordHash = await bcrypt.hash(password, 10);
     }
 
-    checkPrivilege(privilege: UserPrivilege): boolean {
-        // A user with isAdmin = true has all privileges.
-        return this.data.isAdmin || this.data.privileges.includes(privilege);
-    }
-
     // true - Success.
     // false - Already added.
     addPrivilege(privilege: UserPrivilege): boolean {
         // Privileges are stored in a array, not a set.
         // Perform a check to ensure uniqueness.
-        if (this.checkPrivilege(privilege)) {
+        if (User.checkPrivilege(this, privilege)) {
             return false;
         }
 
@@ -82,7 +79,7 @@ export class User {
     // true - Success.
     // false - Doesn't have.
     delPrivilege(privilege: UserPrivilege): boolean {
-        if (!this.checkPrivilege(privilege)) {
+        if (!User.checkPrivilege(this, privilege)) {
             return false;
         }
 
@@ -92,7 +89,7 @@ export class User {
 
     getBriefInfo(): IUserBriefInfo {
         return {
-            uuid: uuidToString(this.uuid),
+            uuid: UUIDHelper.toString(this.uuid),
             userName: this.userName,
             description: this.description,
             email: this.email,
@@ -105,10 +102,10 @@ export class User {
         await this.data.save();
     }
 
-    // Find a user by a UUID, return null if the passed UUID is illegal or not found.
-    static async findByUUID(uuid: string): Promise<User> {
+    // Find a user by a UUID, return null if the passed UUID is not found.
+    static async findByUUID(uuid: UUID): Promise<User> {
         // uuid may not be a legal object id.
-        const data: UserInstance = await UserModel.findOne({ _id: uuidFromString(uuid) });
+        const data: UserInstance = await UserModel.findOne({ _id: uuid });
         return data ? new User(data) : null;
     }
 
@@ -199,5 +196,10 @@ export class User {
         await this.save();
 
         return true;
+    }
+
+    static checkPrivilege(user: User, privilege: UserPrivilege): boolean {
+        // A user with isAdmin = true has all privileges.
+        return user.data.isAdmin || user.data.privileges.includes(privilege);
     }
 }

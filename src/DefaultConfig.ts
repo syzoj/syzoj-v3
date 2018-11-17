@@ -11,5 +11,11 @@ export default {
     },
     security: {
         sessionSecret: generatrRandomString()
+    },
+    limits: {
+        permissionControl: {
+            maxUserCount: 10,
+            maxGroupCount: 10
+        }
     }
 } as IConfig;

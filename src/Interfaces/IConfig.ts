@@ -21,4 +21,13 @@ export default interface IConfig {
         // default randomly generated.
         sessionSecret?: string;
     };
+
+    limits?: {
+        // If the limits of PermissionControl is too large, the performance may be
+        // slowed down.
+        permissionControl?: {
+            maxUserCount?: number;
+            maxGroupCount?: number;
+        };
+    };
 }

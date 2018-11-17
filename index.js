@@ -54,7 +54,9 @@
     process.execArgv.push("--no-deprecation");
     const child = child_process.fork("./node_modules/.bin/ts-node", ["src/Bootstrap", "--", JSON.stringify(arguments)], { silent: true });
     child.stdout.pipe(process.stdout);
+    child.stderr.pipe(process.stdout);
     if (stream) {
         child.stdout.pipe(stream);
+        child.stderr.pipe(stream);
     }
 })();

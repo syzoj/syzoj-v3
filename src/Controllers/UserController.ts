@@ -5,6 +5,8 @@ import NotFoundError from "Errors/NotFoundError";
 import AuthError, { AuthErrorType } from "Errors/AuthError";
 import InvalidInputError from "Errors/InvalidInputError";
 
+import UUIDHelper from "Helpers/UUIDHelper";
+
 import { User, IUserBriefInfo, UserPrivilege } from "Services/User";
 
 @JsonController()
@@ -12,7 +14,7 @@ export class UserController {
     // Get a user's brief info by its uuid.
     @Get("/user/getByUUID/:uuid")
     private async getByUUID(@Param("uuid") uuid: string): Promise<IUserBriefInfo> {
-        const user: User = await User.findByUUID(uuid);
+        const user: User = await User.findByUUID(UUIDHelper.fromString(uuid));
         if (!user) {
             throw new NotFoundError(User, { uuid });
         }
@@ -60,12 +62,12 @@ export class UserController {
                          @BodyParam("oldPassword") oldPassword: string,
                          @BodyParam("newPassword") newPassword: string,
                          @BodyParam("email") email: string): Promise<void> {
-        const targetUser: User = await User.findByUUID(uuid);
+        const targetUser: User = await User.findByUUID(UUIDHelper.fromString(uuid));
         if (!targetUser) {
             throw new NotFoundError(User, { uuid });
         }
 
-        const privileged: boolean = currentUser.checkPrivilege(UserPrivilege.ManageUsers);
+        const privileged: boolean = User.checkPrivilege(currentUser, UserPrivilege.ManageUsers);
 
         // Only a "ManageUsers" privileged user can modify another user.
         if (!privileged && await targetUser.uuid !== await currentUser.uuid) {
@@ -110,7 +112,7 @@ export class UserController {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        const user: User = await User.findByUUID(uuid);
+        const user: User = await User.findByUUID(UUIDHelper.fromString(uuid));
         if (!user) {
             throw new NotFoundError(User, { uuid });
         }

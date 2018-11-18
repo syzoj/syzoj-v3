@@ -35,7 +35,7 @@ class SYZOJ {
 
         this.testMode = testMode;
         if (this.testMode) {
-            this.logger.warn("Running under test mode, it's allowed to drop database with a request! DO NOT use this UNLESS you want to run the testcases!");
+            this.logger.warn("Running under test mode, it's allowed to drop database with a request! DO NOT use this UNLESS you want to run the unit tests!");
         }
 
         // If the configuration file doesn't exist, write the default configuration

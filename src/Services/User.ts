@@ -123,7 +123,7 @@ export default class User {
     // is a uppercase / lowercase letter or a number or any of '-_.#$' and is
     // NOT '%'.
     static isValidUserName(userName: string): boolean {
-        return /^[a-zA-Z0-9\-\_\.\#\$]{1,16}$/.test(userName);
+        return userName && /^[a-zA-Z0-9\-\_\.\#\$]{1,16}$/.test(userName);
     }
 
     // Register a new user with input userName / password / email.

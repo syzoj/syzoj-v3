@@ -85,13 +85,13 @@ export default class ProblemSet {
 
     // A ProblemSet's name is a string of 1 ~ 50 non-newline characters.
     static isValidName(name: string): boolean {
-        return /^[^\n]{1,50}$/.test(name);
+        return name && /^[^\n]{1,50}$/.test(name);
     }
 
     // A ProblemSet's name is a string of 1 ~ 16 ASCII characters, and each character
     // is a uppercase / lowercase letter or a number or any of '-_.#$%'.
     static isValidUrlName(name: string): boolean {
-        return /^[a-zA-Z0-9\-\_\.\#\$\%]{1,16}$/.test(name);
+        return name && /^[a-zA-Z0-9\-\_\.\#\$\%]{1,16}$/.test(name);
     }
 
     // Create a new global ProblemSet with input name & urlName.

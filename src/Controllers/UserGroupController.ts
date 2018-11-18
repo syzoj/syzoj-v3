@@ -25,11 +25,11 @@ export class UserController {
     }
 
     // Get a group's brief info by its name.
-    @Get("/userGroup/getByGroupName/:groupName")
-    private async getByGroupName(@Param("groupName") groupName: string): Promise<IUserGroupBriefInfo> {
-        const group: UserGroup = await UserGroup.findByGroupName(groupName);
+    @Get("/userGroup/getByName/:name")
+    private async getByName(@Param("name") name: string): Promise<IUserGroupBriefInfo> {
+        const group: UserGroup = await UserGroup.findByName(name);
         if (!group) {
-            throw new NotFoundError(UserGroup, { groupName });
+            throw new NotFoundError(UserGroup, { name });
         }
 
         return await group.getBriefInfo();
@@ -39,18 +39,18 @@ export class UserController {
     @Post("/userGroup/create")
     @Authorized()
     private async create(@State("user") currentUser: User,
-                         @BodyParam("groupName") groupName: string): Promise<IUserGroupBriefInfo> {
+                         @BodyParam("name") name: string): Promise<IUserGroupBriefInfo> {
         if (!User.checkPrivilege(currentUser, UserPrivilege.ManageUsers)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        if (!UserGroup.isValidGroupName(groupName)) {
-            throw new InvalidInputError({ groupName });
+        if (!UserGroup.isValidName(name)) {
+            throw new InvalidInputError({ name });
         }
 
-        const group: UserGroup = await UserGroup.createGroup(groupName);
+        const group: UserGroup = await UserGroup.createGroup(name);
         if (!group) {
-            throw new DuplicateError(UserGroup, { groupName });
+            throw new DuplicateError(UserGroup, { name });
         }
 
         return await group.getBriefInfo();

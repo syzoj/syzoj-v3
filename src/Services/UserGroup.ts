@@ -3,7 +3,7 @@ import UUIDHelper, { UUID } from "Helpers/UUIDHelper";
 
 export interface IUserGroupBriefInfo {
     uuid: string;
-    groupName: string;
+    name: string;
 }
 
 export default class UserGroup {
@@ -18,15 +18,15 @@ export default class UserGroup {
     }
 
     get uuid(): UUID { return this.data._id; }
-    get groupName(): string { return this.data.groupName; }
-    set groupName(groupName: string) { this.data.groupName = groupName; }
+    get name(): string { return this.data.name; }
+    set name(name: string) { this.data.name = name; }
     get memberCount(): number { return this.data.memberCount; }
     set memberCount(memberCount: number) { this.data.memberCount = memberCount; }
 
     getBriefInfo(): IUserGroupBriefInfo {
         return {
             uuid: UUIDHelper.toString(this.uuid),
-            groupName: this.groupName
+            name: this.name
         };
     }
 
@@ -41,28 +41,28 @@ export default class UserGroup {
         return data ? new UserGroup(data) : null;
     }
 
-    // Find a user by its groupName, return null if not found.
-    static async findByGroupName(groupName: string): Promise<UserGroup> {
-        const data: UserGroupInstance = await UserGroupModel.findOne({ groupName });
+    // Find a user by its name, return null if not found.
+    static async findByName(name: string): Promise<UserGroup> {
+        const data: UserGroupInstance = await UserGroupModel.findOne({ name });
         return data ? new UserGroup(data) : null;
     }
 
-    // A groupName is a string of 1 ~ 16 ASCII characters, and each character
+    // A name is a string of 1 ~ 16 ASCII characters, and each character
     // is a uppercase / lowercase letter or a number or any of '-_.#$' and is
     // NOT '%'.
-    static isValidGroupName(groupName: string): boolean {
-        return groupName && /^[a-zA-Z0-9\-\_\.\#\$]{1,16}$/.test(groupName);
+    static isValidName(name: string): boolean {
+        return name && /^[a-zA-Z0-9\-\_\.\#\$]{1,16}$/.test(name);
     }
 
-    // Create a new UserGroup with input groupName.
-    // Return the registered UserGroup object, or null if the groupName exists.
-    static async createGroup(groupName: string): Promise<UserGroup> {
-        if (await this.findByGroupName(groupName)) {
+    // Create a new UserGroup with input name.
+    // Return the registered UserGroup object, or null if the name exists.
+    static async createGroup(name: string): Promise<UserGroup> {
+        if (await this.findByName(name)) {
             return null;
         }
 
         const newUserGroup: UserGroup = new UserGroup({
-            groupName
+            name
         });
 
         await newUserGroup.save();

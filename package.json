@@ -10,7 +10,7 @@
   "scripts": {
     "dev-watch": "nodemon --watch 'src/**/*' -e ts,tsx index.js --",
     "dev": "node index.js",
-    "test": "mocha -r ./node_modules/ts-node/register test/*.ts"
+    "test": "mocha -r ./node_modules/ts-node/register test/*.ts -b"
   },
   "dependencies": {
     "app-module-path": "^2.2.0",

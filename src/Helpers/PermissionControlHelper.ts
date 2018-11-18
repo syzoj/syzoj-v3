@@ -38,6 +38,10 @@ export default {
     // Filter invalid properties / non-existing or exceeded user & groups in input
     // IPermissionControl, return a valid IPermissionControl.
     async normalize(input: IPermissionControl): Promise<IPermissionControl> {
+        if (!input) {
+            input = {} as IPermissionControl;
+        }
+
         const result: IPermissionControl = {
             defaultAllow: !!input.defaultAllow,
             guestAllow: !!input.guestAllow,

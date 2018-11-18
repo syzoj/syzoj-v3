@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import { JsonController, Param, BodyParam, State, Get, Post, OnUndefined, Authorized } from "routing-controllers";
 
+import IPermissionControl from "Interfaces/IPermissionControl";
+
 import NotFoundError from "Errors/NotFoundError";
 import AuthError, { AuthErrorType } from "Errors/AuthError";
 import InvalidInputError from "Errors/InvalidInputError";
@@ -133,6 +135,17 @@ export class ProblemSetController {
                                           @BodyParam("newPermissionControl") newPermissionControl: IProblemSetPermissionControl): Promise<void> {
         if (!User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
             throw new AuthError(AuthErrorType.PermissionDenied);
+        }
+
+        // Normalize (may be invalid) input data
+        if (!newPermissionControl) {
+            newPermissionControl = {} as IProblemSetPermissionControl;
+        }
+        if (!newPermissionControl.list) {
+            newPermissionControl.list = {} as IPermissionControl;
+        }
+        if (!newPermissionControl.modify) {
+            newPermissionControl.modify = {} as IPermissionControl;
         }
 
         if (newPermissionControl.modify.guestAllow) {

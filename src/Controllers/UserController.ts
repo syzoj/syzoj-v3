@@ -99,6 +99,8 @@ export class UserController {
             throw new InvalidInputError({ email });
         }
         targetUser.email = email;
+
+        await targetUser.save();
     }
 
     @Post("/user/updatePrivilege/:uuid")

@@ -6,7 +6,7 @@ export interface IUserGroupBriefInfo {
     groupName: string;
 }
 
-export class UserGroup {
+export default class UserGroup {
     private data: UserGroupInstance;
 
     constructor(data: any) {

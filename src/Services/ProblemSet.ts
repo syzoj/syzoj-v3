@@ -18,7 +18,7 @@ export interface IProblemSetBriefInfo {
     ownUser: string;
 }
 
-export class ProblemSet {
+export default class ProblemSet {
     private data: ProblemSetInstance;
 
     constructor(data: any) {

@@ -6,8 +6,8 @@ import InvalidInputError from "Errors/InvalidInputError";
 import DuplicateError from "Errors/DuplicateError";
 import AuthError, { AuthErrorType } from "Errors/AuthError";
 
-import { User, IUserBriefInfo } from "Services/User";
-import { ProblemSet } from "Services/ProblemSet";
+import User, { IUserBriefInfo } from "Services/User";
+import ProblemSet from "Services/ProblemSet";
 
 @JsonController()
 export class AuthController {
@@ -17,7 +17,6 @@ export class AuthController {
                            @BodyParam("password") password: string,
                            @BodyParam("email") email: string): Promise<IUserBriefInfo> {
         if (state.user) {
-            await ProblemSet.createPrivate(state.user.uuid);
             throw new AuthError(AuthErrorType.AlreadyLoggedIn);
         }
 

@@ -2,7 +2,7 @@ import app from "App";
 import * as KoaSession from "koa-session";
 
 import UUIDHelper from "Helpers/UUIDHelper";
-import { User } from "Services/User";
+import User from "Services/User";
 
 app.koaApp.keys = [app.config.security.sessionSecret];
 app.koaApp.use(KoaSession({

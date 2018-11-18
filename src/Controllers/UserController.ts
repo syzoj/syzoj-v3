@@ -7,7 +7,7 @@ import InvalidInputError from "Errors/InvalidInputError";
 
 import UUIDHelper from "Helpers/UUIDHelper";
 
-import { User, IUserBriefInfo, UserPrivilege } from "Services/User";
+import User, { IUserBriefInfo, UserPrivilege } from "Services/User";
 
 @JsonController()
 export class UserController {

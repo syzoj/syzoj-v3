@@ -8,8 +8,8 @@ import DuplicateError from "Errors/DuplicateError";
 
 import UUIDHelper from "Helpers/UUIDHelper";
 
-import { User, UserPrivilege } from "Services/User";
-import { UserGroup, IUserGroupBriefInfo } from "Services/UserGroup";
+import User, { UserPrivilege } from "Services/User";
+import UserGroup, { IUserGroupBriefInfo } from "Services/UserGroup";
 
 @JsonController()
 export class UserController {

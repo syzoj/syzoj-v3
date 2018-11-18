@@ -8,8 +8,8 @@ import DuplicateError from "Errors/DuplicateError";
 
 import UUIDHelper from "Helpers/UUIDHelper";
 
-import { User, UserPrivilege } from "Services/User";
-import { IProblemSetBriefInfo, ProblemSet, IProblemSetPermissionControl } from "Services/ProblemSet";
+import User, { UserPrivilege } from "Services/User";
+import ProblemSet, { IProblemSetBriefInfo, IProblemSetPermissionControl } from "Services/ProblemSet";
 import PermissionControlHelper from "Helpers/PermissionControlHelper";
 
 @JsonController()

@@ -7,7 +7,7 @@ import * as bcrypt from "bcrypt";
 
 import IPermissionControl from "Interfaces/IPermissionControl";
 
-import { UserGroup } from "Services/UserGroup";
+import UserGroup from "Services/UserGroup";
 
 export enum UserPrivilege {
     ManageProblems = "ManageProblems",
@@ -23,7 +23,7 @@ export interface IUserBriefInfo {
     isAdmin: boolean;
 }
 
-export class User {
+export default class User {
     private data: UserInstance;
 
     constructor(data: any) {

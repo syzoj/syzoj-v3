@@ -3,8 +3,8 @@ import IPermissionControl from "Interfaces/IPermissionControl";
 import App from "App";
 import UUIDHelper, { UUID } from "Helpers/UUIDHelper";
 
-import { User, UserPrivilege } from "Services/User";
-import { UserGroup } from "Services/UserGroup";
+import User, { UserPrivilege } from "Services/User";
+import UserGroup from "Services/UserGroup";
 
 export default {
     // Convert a PermissionControl structure from database to

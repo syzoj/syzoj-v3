@@ -684,3 +684,266 @@ describe("UserGroup", () => {
         });
     });
 });
+
+const problemSets: string[] = [];
+
+describe("ProblemSet", () => {
+    it("Create ProblemSet without privilege should return AuthError", async () => {
+        const result: any = await requestUnprivileged.post(serverUrl + "/problemSet/create", {
+            body: {
+                name: "测试题库",
+                urlName: "test"
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "AuthError",
+            type: "PermissionDenied"
+        });
+    });
+
+    it("Grant ManageProblems privilege for a user", async () => {
+        const result: any = await requestAdmin.post(serverUrl + "/user/updatePrivilege/" + users[0], {
+            body: {
+                privilege: "ManageProblems",
+                grant: true
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+    });
+
+    it("Create ProblemSet with privilege should success", async () => {
+        const result: any = await request.post(serverUrl + "/problemSet/create", {
+            body: {
+                name: "测试题库",
+                urlName: "test"
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result).to.deep.include({
+            name: "测试题库",
+            urlName: "test"
+        });
+
+        problemSets.push(result.result.uuid);
+    });
+
+    it("Create ProblemSet with duplicated name should success", async () => {
+        const result: any = await request.post(serverUrl + "/problemSet/create", {
+            body: {
+                name: "测试题库",
+                urlName: "test1"
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result).to.deep.include({
+            name: "测试题库",
+            urlName: "test1"
+        });
+
+        problemSets.push(result.result.uuid);
+    });
+
+    it("Create ProblemSet with duplicated url name should return DuplicateError", async () => {
+        const result: any = await request.post(serverUrl + "/problemSet/create", {
+            body: {
+                name: "测试题库1",
+                urlName: "test"
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "DuplicateError",
+            objectType: "ProblemSet",
+            match: {
+                urlName: "test"
+            }
+        });
+    });
+
+    it("Delete ProblemSet without privilege should return AuthError", async () => {
+        const result: any = await requestUnprivileged.post(serverUrl + "/problemSet/delete", {
+            body: {
+                uuid: problemSets[0]
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "AuthError",
+            type: "PermissionDenied"
+        });
+    });
+
+    it("Delete ProblemSet with privilege should success", async () => {
+        const result: any = await request.post(serverUrl + "/problemSet/delete", {
+            body: {
+                uuid: problemSets.pop()
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+    });
+
+    it("Update ProblemSet's PermissionControl without privilege should return AuthError", async () => {
+        const result: any = await requestUnprivileged.post(serverUrl + "/problemSet/updatePermissionControl", {
+            body: {
+                uuid: problemSets[0],
+                newPermissionControl: {
+                    list: {
+                        guestAllow: true,
+                        defaultAllow: true,
+                        userUUIDs: [users[0], users[1]],
+                        groupUUIDs: [groups[0]]
+                    },
+                    modify: {
+                        guestAllow: false,
+                        defaultAllow: false,
+                        userUUIDs: [users[0]],
+                        groupUUIDs: []
+                    }
+                }
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "AuthError",
+            type: "PermissionDenied"
+        });
+    });
+
+    it("Update ProblemSet's PermissionControl with privilege should success", async () => {
+        const newPermissionControl: any = {
+            list: {
+                guestAllow: true,
+                defaultAllow: true,
+                userUUIDs: [users[0], users[1]],
+                groupUUIDs: [groups[0]]
+            },
+            modify: {
+                guestAllow: false,
+                defaultAllow: false,
+                userUUIDs: [users[0]],
+                groupUUIDs: []
+            }
+        };
+
+        const result: any = await request.post(serverUrl + "/problemSet/updatePermissionControl", {
+            body: {
+                uuid: problemSets[0],
+                newPermissionControl
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+
+        const result2: any = await request.get(serverUrl + "/problemSet/getByUUID/" + problemSets[0]);
+
+        expect(result2).to.deep.include({
+            success: true
+        });
+
+        expect(result2.result).to.deep.include({
+            name: "测试题库",
+            urlName: "test",
+            permissionControl: newPermissionControl
+        });
+    });
+
+    it("Update ProblemSet's PermissionControl without list.guestAllow = true should return InvalidInputError", async () => {
+        const newPermissionControl: any = {
+            modify: {
+                guestAllow: true,
+            }
+        };
+
+        const result: any = await request.post(serverUrl + "/problemSet/updatePermissionControl", {
+            body: {
+                uuid: problemSets[0],
+                newPermissionControl
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "InvalidInputError",
+            fieldName: "newPermissionControl.modify.guestAllow",
+            value: true
+        });
+    });
+
+    it("Registered user should have a private ProblemSet created automatically", async () => {
+        const result: any = await request.get(serverUrl + "/problemSet/getByOwnUser/" + users[0]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result).to.deep.include({
+            ownUser: users[0]
+        });
+
+        problemSets.push(result.result.uuid);
+    });
+
+    it("Update a private ProblemSet's PermissionControl should return InvalidInputError", async () => {
+        const result: any = await request.post(serverUrl + "/problemSet/updatePermissionControl", {
+            body: {
+                uuid: problemSets[1],
+                newPermissionControl: {}
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: false
+        });
+        expect(result.error).to.deep.include({
+            error: "InvalidInputError",
+            fieldName: "uuid",
+            value: problemSets[1]
+        });
+    });
+
+    it("ProblemSet's brief info got by a unprivileged user shouldn't contain PermissionControl", async () => {
+        const result: any = await requestUnprivileged.get(serverUrl + "/problemSet/getByUUID/" + problemSets[0]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result.permissionControl).to.be.undefined; // tslint:disable-line
+    });
+
+    it("Private ProblemSet's brief info shouldn't contain PermissionControl", async () => {
+        const result: any = await request.get(serverUrl + "/problemSet/getByUUID/" + problemSets[1]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result.permissionControl).to.be.undefined; // tslint:disable-line
+    });
+});

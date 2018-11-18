@@ -136,7 +136,7 @@ export class ProblemSetController {
         }
 
         if (newPermissionControl.modify.guestAllow) {
-            throw new InvalidInputError({ guestAllow: newPermissionControl.modify.guestAllow });
+            throw new InvalidInputError({ "newPermissionControl.modify.guestAllow": newPermissionControl.modify.guestAllow });
         }
 
         const problemSet: ProblemSet = await ProblemSet.findByUUID(UUIDHelper.fromString(uuid));

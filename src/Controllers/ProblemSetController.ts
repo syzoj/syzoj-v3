@@ -31,7 +31,7 @@ export class ProblemSetController {
 
         // A non-manager user can't see the permission control
         const briefInfo: IProblemSetBriefInfo = await problemSet.getBriefInfo();
-        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
+        if (briefInfo.ownUser || !User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
             delete briefInfo.permissionControl;
         }
 
@@ -53,7 +53,7 @@ export class ProblemSetController {
 
         // A non-manager user can't see the permission control
         const briefInfo: IProblemSetBriefInfo = await problemSet.getBriefInfo();
-        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
+        if (briefInfo.ownUser || !User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
             delete briefInfo.permissionControl;
         }
 
@@ -73,11 +73,8 @@ export class ProblemSetController {
             throw new AuthError(AuthErrorType.PermissionDenied);
         }
 
-        // A non-manager user can't see the permission control
         const briefInfo: IProblemSetBriefInfo = await problemSet.getBriefInfo();
-        if (!User.checkPrivilege(currentUser, UserPrivilege.ManageProblems)) {
-            delete briefInfo.permissionControl;
-        }
+        delete briefInfo.permissionControl;
 
         return briefInfo;
     }

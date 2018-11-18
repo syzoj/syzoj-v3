@@ -128,5 +128,7 @@ export class UserController {
         } else {
             user.delPrivilege(privilege as UserPrivilege);
         }
+
+        await user.save();
     }
 }

@@ -122,7 +122,7 @@ export default class User {
     }
 
     static isValidEmail(email: string): boolean {
-        return isEmail(email);
+        return email && isEmail(email);
     }
 
     // A userName is a string of 1 ~ 16 ASCII characters, and each character

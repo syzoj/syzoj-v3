@@ -28,9 +28,10 @@ export class AuthController {
             throw new InvalidInputError({ email });
         }
 
-        const user: User = await User.registerNewUser(userName, password, email);
+        const [user, conflitField]: [User, any] = await User.registerNewUser(userName, password, email);
+
         if (!user) {
-            throw new DuplicateError(User, { userName });
+            throw new DuplicateError(User, conflitField);
         }
 
         await user.save();

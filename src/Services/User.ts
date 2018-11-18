@@ -115,6 +115,12 @@ export default class User {
         return data ? new User(data) : null;
     }
 
+    // Find a user by its email, return null if not found.
+    static async findByEmail(email: string): Promise<User> {
+        const data: UserInstance = await UserModel.findOne({ email });
+        return data ? new User(data) : null;
+    }
+
     static isValidEmail(email: string): boolean {
         return isEmail(email);
     }
@@ -127,12 +133,16 @@ export default class User {
     }
 
     // Register a new user with input userName / password / email.
-    // Return the registered user object, or null if the userName exists.
+    // Return [registered user object, null], or [null, conflit fleid] if the userName exists.
     static async registerNewUser(userName: string,
                                  password: string,
-                                 email: string): Promise<User> {
+                                 email: string): Promise<[User, any]> {
         if (await this.findByUserName(userName)) {
-            return null;
+            return [null, { userName }];
+        }
+
+        if (await this.findByEmail(email)) {
+            return [null, { email }];
         }
 
         const newUser: User = new User({
@@ -143,7 +153,7 @@ export default class User {
         await newUser.setPassword(password);
         await newUser.save();
 
-        return newUser;
+        return [newUser, null];
     }
 
     inGroup(group: UserGroup): boolean {

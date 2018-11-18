@@ -45,19 +45,23 @@ export default {
             groupUUIDs: []
         };
 
-        for (let i = 0; i < Math.min(input.userUUIDs.length, App.config.limits.permissionControl.maxUserCount); i++) {
-            const user: User = await User.findByUUID(UUIDHelper.fromString(input.userUUIDs[i]));
-            const normalizedString: string = user ? UUIDHelper.toString(user.uuid) : null;
-            if (normalizedString && !result.userUUIDs.includes(normalizedString)) {
-                result.userUUIDs.push(normalizedString);
+        if (Array.isArray(input.userUUIDs)) {
+            for (let i = 0; i < Math.min(input.userUUIDs.length, App.config.limits.permissionControl.maxUserCount); i++) {
+                const user: User = await User.findByUUID(UUIDHelper.fromString(input.userUUIDs[i]));
+                const normalizedString: string = user ? UUIDHelper.toString(user.uuid) : null;
+                if (normalizedString && !result.userUUIDs.includes(normalizedString)) {
+                    result.userUUIDs.push(normalizedString);
+                }
             }
         }
 
-        for (let i = 0; i < Math.min(input.groupUUIDs.length, App.config.limits.permissionControl.maxGroupCount); i++) {
-            const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(input.groupUUIDs[i]));
-            const normalizedString: string = group ? UUIDHelper.toString(group.uuid) : null;
-            if (normalizedString && !result.groupUUIDs.includes(normalizedString)) {
-                result.groupUUIDs.push(normalizedString);
+        if (Array.isArray(input.groupUUIDs)) {
+            for (let i = 0; i < Math.min(input.groupUUIDs.length, App.config.limits.permissionControl.maxGroupCount); i++) {
+                const group: UserGroup = await UserGroup.findByUUID(UUIDHelper.fromString(input.groupUUIDs[i]));
+                const normalizedString: string = group ? UUIDHelper.toString(group.uuid) : null;
+                if (normalizedString && !result.groupUUIDs.includes(normalizedString)) {
+                    result.groupUUIDs.push(normalizedString);
+                }
             }
         }
 

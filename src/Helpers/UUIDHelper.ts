@@ -4,11 +4,11 @@ export type UUID = Types.ObjectId;
 
 export default {
     toString(uuid: UUID): string {
-        if (!uuid) {
-            return null;
+        try {
+            return uuid.toHexString();
+        } catch (e) {
+            return "";
         }
-
-        return uuid.toHexString();
     },
 
     fromString(stringUUID: string): UUID {

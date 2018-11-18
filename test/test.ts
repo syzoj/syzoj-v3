@@ -572,6 +572,34 @@ describe("UserGroup", () => {
         });
     });
 
+    it("Get UserGroup's brief info by UUID should success", async () => {
+        const result: any = await requestUnprivileged.get(serverUrl + "/userGroup/getByUUID/" + groups[0]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result).to.deep.include({
+            uuid: groups[0],
+            name: "testGroup"
+        });
+
+        groups.push(result.result.uuid);
+    });
+
+    it("Get UserGroup's brief info by name should success", async () => {
+        const result: any = await requestUnprivileged.get(serverUrl + "/userGroup/getByName/" + "testGroup");
+
+        expect(result).to.deep.include({
+            success: true
+        });
+        expect(result.result).to.deep.include({
+            uuid: groups[0],
+            name: "testGroup"
+        });
+
+        groups.push(result.result.uuid);
+    });
+
     it("Add user to UserGroup with privilege should success", async () => {
         const result: any = await request.post(serverUrl + "/userGroup/addUser", {
             body: {

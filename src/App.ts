@@ -8,14 +8,15 @@ import * as Lodash from "lodash";
 import CommonError from "Errors/CommonError";
 
 import IConfig from "Interfaces/IConfig";
-import DefaultConfig from "DefaultConfig";
+import getDefaultConfig from "DefaultConfig";
 
 class SYZOJ {
     public koaApp: KoaApp;
     public logger: Winston.Logger;
     public config: IConfig;
+    public testMode: boolean; // Under test mode it's allowed to drop database with a request.
 
-    public async initialize(configFile: string, version: any) {
+    public async initialize(configFile: string, version: any, testMode: boolean) {
         this.logger = Winston.createLogger({
             level: "info",
             format: Winston.format.combine(
@@ -32,13 +33,18 @@ class SYZOJ {
             this.logger.warn(`This is a git version (${version.gitVersion}) and maybe unstable, use it with caution in production!`);
         }
 
+        this.testMode = testMode;
+        if (this.testMode) {
+            this.logger.warn("Running under test mode, it's allowed to drop database with a request! DO NOT use this UNLESS you want to run the testcases!");
+        }
+
         // If the configuration file doesn't exist, write the default configuration
         // file to it.
         // If the configuration file exists, merge it with the default configuration
         // and update the file (for upgrading).
         if (!await fs.pathExists(configFile)) {
             this.logger.warn(`The specified configuration file ${configFile} doesn't exist, attempting to create a default one.`);
-            this.config = DefaultConfig;
+            this.config = getDefaultConfig(this.testMode);
             try {
                 await fs.outputJSON(configFile, this.config, { spaces: 1 });
                 this.logger.info(`Successfully written default configuration to '${configFile}'.`);
@@ -53,7 +59,7 @@ class SYZOJ {
 
                 // Check if there's new keys in this version's DefaultConfig, if so,
                 // update the configuration file.
-                this.config = Lodash.merge(DefaultConfig, parsedConfig);
+                this.config = Lodash.merge(getDefaultConfig(this.testMode), parsedConfig);
                 if (!Lodash.isEqual(this.config, parsedConfig)) {
                     this.logger.info(`Configuration upgraded with default values for new keys.`);
                     try {
@@ -66,6 +72,16 @@ class SYZOJ {
                 }
             } catch (e) {
                 this.logger.error(`Can't read configuration from '${configFile}' - ${e}.`);
+                process.exit(1);
+            }
+        }
+
+        // Test mode is DANGEROUS, to prevent dropping the debug environment database,
+        // enforing the database name to start with 'test_'
+        if (this.testMode) {
+            const databaseName: string = this.config.database.mongoUrl.split("/").pop();
+            if (!databaseName.startsWith("test_")) {
+                this.logger.error(`Under test mode, database's name MUST start with 'test_'. Invalid database '${databaseName}'!`);
                 process.exit(1);
             }
         }

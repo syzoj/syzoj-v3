@@ -27,6 +27,7 @@
         .version("v" + versionString + (gitVersion ? ` (Git ${gitVersion})` : ""), "-v, --version")
         .option("-c, --config <file>", "configuration file (if the path don't exist, it will be created automatically)")
         .option("-l, --log <file>", "log file (log will be output to both log file and stdout)")
+        .option("-t, --test-mode", "run under test mode (allow drop database with a request)")
         .parse(process.argv);
 
     if (!Commander.config) {
@@ -36,7 +37,8 @@
     let arguments = {
         config: Commander.config,
         log: Commander.log,
-        version: { versionString, gitVersion }
+        version: { versionString, gitVersion },
+        testMode: Commander.testMode
     };
 
     let stream = null;

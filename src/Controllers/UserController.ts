@@ -40,6 +40,19 @@ export class UserController {
         return await user.getBriefInfo();
     }
 
+    // Get groups a user belongs to
+    @Get("/user/getGroups/:uuid")
+    private async getGroups(@Param("uuid") uuid: string): Promise<string []> {
+        const user: User = await User.findByUUID(UUIDHelper.fromString(uuid));
+        if (!user) {
+            throw new NotFoundError(User, { uuid });
+        }
+
+        const groupUUIDs = user.groups || [];
+
+        return groupUUIDs.map(UUIDHelper.toString);
+    }
+
     // Update a user's infomation.
     // userName:    Can only be modified by a "ManageUsers" privileged user.
     //

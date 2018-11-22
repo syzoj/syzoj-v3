@@ -1,4 +1,5 @@
 import { ProblemSetInstance, ProblemSetModel } from "Models/ProblemSetModel";
+import { ProblemInstance, ProblemModel } from "Models/ProblemModel";
 import UUIDHelper, { UUID } from "Helpers/UUIDHelper";
 import PermissionControlHelper from "Helpers/PermissionControlHelper";
 
@@ -129,8 +130,8 @@ export default class ProblemSet {
         return newProblemSet;
     }
 
+    // Only a ProblemSet with no problems can be deleted.
     static async delete(problemSet: ProblemSet): Promise<void> {
-        // TODO: Find all problems in this ProblemSet and (move them to somewhere?).
         await ProblemSetModel.deleteOne({
             _id: problemSet.uuid
         });

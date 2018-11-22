@@ -120,6 +120,16 @@ export class ProblemSetController {
             throw new NotFoundError(ProblemSet, { uuid });
         }
 
+        // A private ProblemSet can't be deleted.
+        if (problemSet.ownUser) {
+            throw new InvalidInputError({ uuid });
+        }
+
+        // A ProblemSet with problems can't be deleted.
+        if (problemSet.problemCount) {
+            throw new InvalidInputError({ uuid });
+        }
+
         await ProblemSet.delete(problemSet);
     }
 

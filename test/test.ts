@@ -560,16 +560,78 @@ describe("UserGroup", () => {
         groups.push(result.result.uuid);
     });
 
-    it("Delete UserGroup with privilege should success", async () => {
-        const result: any = await request.post(serverUrl + "/userGroup/delete", {
+    it("Add users to just created UserGroup", async () => {
+        const result: any = await request.post(serverUrl + "/userGroup/addUser", {
             body: {
-                uuid: groups.pop()
+                userUUID: users[0],
+                groupUUID: groups[1]
             }
         });
 
         expect(result).to.deep.include({
             success: true
         });
+
+        const result2: any = await request.post(serverUrl + "/userGroup/addUser", {
+            body: {
+                userUUID: users[1],
+                groupUUID: groups[1]
+            }
+        });
+
+        expect(result2).to.deep.include({
+            success: true
+        });
+    });
+
+    it("Users added to UserGroup should belong to the groups.", async () => {
+        const result: any = await request.get(serverUrl + "/user/getGroups/" + users[0]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+
+        expect(result.result).to.deep.include(groups[1]);
+
+        const result2: any = await request.get(serverUrl + "/user/getGroups/" + users[0]);
+
+        expect(result2).to.deep.include({
+            success: true
+        });
+
+        expect(result2.result).to.deep.include(groups[1]);
+    });
+
+    it("Delete UserGroup with privilege should success", async () => {
+        const result: any = await request.post(serverUrl + "/userGroup/delete", {
+            body: {
+                uuid: groups[1]
+            }
+        });
+
+        expect(result).to.deep.include({
+            success: true
+        });
+    });
+
+    it("Delete group should cause all users in the group leave the group.", async () => {
+        const result: any = await request.get(serverUrl + "/user/getGroups/" + users[0]);
+
+        expect(result).to.deep.include({
+            success: true
+        });
+
+        expect(result.result).not.to.deep.include(groups[1]);
+
+        const result2: any = await request.get(serverUrl + "/user/getGroups/" + users[0]);
+
+        expect(result2).to.deep.include({
+            success: true
+        });
+
+        expect(result2.result).not.to.deep.include(groups[1]);
+
+        groups.pop();
     });
 
     it("Get UserGroup's brief info by UUID should success", async () => {

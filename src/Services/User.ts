@@ -20,6 +20,7 @@ export interface IUserBriefInfo {
     description: string;
     email: string;
     avatar: string;
+    registerTime: Date;
     isAdmin: boolean;
 }
 
@@ -43,6 +44,10 @@ export default class User {
     set email(email: string) { this.data.email = email; }
     get isAdmin(): boolean { return this.data.isAdmin; }
     set isAdmin(isAdmin: boolean) { this.data.isAdmin = isAdmin; }
+    get registerIP(): string { return this.data.registerIP; }
+    set registerIP(registerIP: string) { this.data.registerIP = registerIP; }
+    get registerTime(): Date { return this.data.registerTime; }
+    set registerTime(registerTime: Date) { this.data.registerTime = registerTime; }
     get groups(): UUID[] { return this.data.groups; }
     set groups(groups: UUID[]) { this.data.groups = groups; }
 
@@ -94,6 +99,7 @@ export default class User {
             description: this.description,
             email: this.email,
             avatar: this.email, // TODO: Generate Gravatar URL
+            registerTime: this.registerTime,
             isAdmin: this.isAdmin
         };
     }
@@ -136,7 +142,9 @@ export default class User {
     // Return [registered user object, null], or [null, conflit fleid] if the userName exists.
     static async registerNewUser(userName: string,
                                  password: string,
-                                 email: string): Promise<[User, any]> {
+                                 email: string,
+                                 registerIP: string,
+                                 registerTime: Date): Promise<[User, any]> {
         if (await this.findByUserName(userName)) {
             return [null, { userName }];
         }
@@ -147,7 +155,9 @@ export default class User {
 
         const newUser: User = new User({
             userName,
-            email
+            email,
+            registerIP,
+            registerTime
         });
 
         await newUser.setPassword(password);

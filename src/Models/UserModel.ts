@@ -9,6 +9,8 @@ const schema: Schema = new Schema({
     description: String,
     passwordHash: String,
     isAdmin: Boolean,
+    registerIP: String,
+    registerTime: Date,
     privileges: [String],
     groups: [ObjectId]
 });

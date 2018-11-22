@@ -1,5 +1,6 @@
 import "reflect-metadata";
-import { JsonController, Param, BodyParam, QueryParam, State, Get, Post, OnUndefined } from "routing-controllers";
+import { JsonController, BodyParam, State, Post, Req, OnUndefined } from "routing-controllers";
+import { Request } from "koa";
 
 import NotFoundError from "Errors/NotFoundError";
 import InvalidInputError from "Errors/InvalidInputError";
@@ -13,6 +14,7 @@ import ProblemSet from "Services/ProblemSet";
 export class AuthController {
     @Post("/auth/register")
     private async register(@State() state,
+                           @Req() request: Request,
                            @BodyParam("userName") userName: string,
                            @BodyParam("password") password: string,
                            @BodyParam("email") email: string): Promise<IUserBriefInfo> {
@@ -28,7 +30,7 @@ export class AuthController {
             throw new InvalidInputError({ email });
         }
 
-        const [user, conflitField]: [User, any] = await User.registerNewUser(userName, password, email);
+        const [user, conflitField]: [User, any] = await User.registerNewUser(userName, password, email, request.ip, new Date());
 
         if (!user) {
             throw new DuplicateError(User, conflitField);
